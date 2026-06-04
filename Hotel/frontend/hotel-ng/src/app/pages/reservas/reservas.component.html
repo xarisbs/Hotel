@@ -1,0 +1,166 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Reservas</h1>
+    <p>Gestión de reservas, calendario y check-in / check-out</p>
+  </header>
+
+  <div class="page-toolbar">
+    <div class="highlight-stats">
+      <article class="highlight checkin">
+        <span>Check-in activos</span>
+        <strong>{{ reservasActivas().length }}</strong>
+      </article>
+      <article class="highlight">
+        <span>Total reservas</span>
+        <strong>{{ reservas().length }}</strong>
+      </article>
+    </div>
+    <button class="btn btn-gold" type="button" (click)="showForm.set(!showForm())">
+      {{ showForm() ? 'Cerrar' : '+ Nueva reserva' }}
+    </button>
+  </div>
+
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  @if (showForm()) {
+    <article class="card card-elevated form-panel booking-panel">
+      <h3 class="section-title">Nueva reserva</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid form-grid-2">
+        <div class="form-field">
+          <label>Huésped</label>
+          <select formControlName="idHuesped">
+            @for (c of clientes(); track c.id) {
+              <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Habitación</label>
+          <select formControlName="idHabitacion">
+            @for (h of habitaciones(); track h.id) {
+              <option [value]="h.id">Hab. {{ h.numero }} — {{ formatPen(h.precioPorNoche) }}/noche</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Check-in</label>
+          <input type="date" formControlName="fechaCheckIn" />
+        </div>
+        <div class="form-field">
+          <label>Check-out</label>
+          <input type="date" formControlName="fechaCheckOut" />
+        </div>
+        <div class="form-field">
+          <label>Huéspedes</label>
+          <input type="number" formControlName="cantidadHuespedes" min="1" />
+        </div>
+        <div class="form-field" style="grid-column: 1 / -1">
+          <label>Observaciones</label>
+          <input formControlName="observaciones" placeholder="Solicitudes especiales, late check-in…" />
+        </div>
+        <div class="form-actions" style="grid-column: 1 / -1">
+          <button class="btn btn-primary" type="submit">Confirmar reserva</button>
+        </div>
+      </form>
+    </article>
+  }
+
+  <div class="grid-2 reservas-layout">
+    <article class="card card-elevated calendar-panel">
+      <div class="calendar-header">
+        <button class="btn btn-ghost btn-icon" type="button" (click)="prevMonth()" aria-label="Mes anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <h3>{{ monthLabel() }}</h3>
+        <button class="btn btn-ghost btn-icon" type="button" (click)="nextMonth()" aria-label="Mes siguiente">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      </div>
+      <div class="calendar-grid">
+        @for (day of calendarDays(); track day.date.toISOString()) {
+          <div
+            class="cal-day"
+            [class.outside]="!day.inMonth"
+            [class.today]="isToday(day.date)"
+            [class.has-booking]="day.reservas.length > 0"
+          >
+            <span class="day-num">{{ day.date.getDate() }}</span>
+            @if (day.reservas.length > 0) {
+              <span class="booking-dot" [title]="day.reservas.length + ' reserva(s)'"></span>
+            }
+          </div>
+        }
+      </div>
+      <div class="calendar-legend">
+        <span><i class="dot booked"></i> Con reserva</span>
+        <span><i class="dot today"></i> Hoy</span>
+      </div>
+    </article>
+
+    <article class="card card-elevated list-panel">
+      <h3 class="section-title">Listado de reservas</h3>
+      @if (reservas().length === 0) {
+        <div class="empty-state compact">
+          <p>No hay reservas. Crea la primera reserva.</p>
+        </div>
+      } @else {
+        <ul class="booking-list">
+          @for (r of reservas(); track r.id) {
+            <li class="booking-item">
+              <div class="booking-main">
+                <div class="booking-guest">
+                  <strong>{{ r.nombreHuesped }}</strong>
+                  <span>Habitación {{ r.numeroHabitacion }}</span>
+                </div>
+                <div class="booking-dates">
+                  <div class="date-block checkin-block">
+                    <small>Check-in</small>
+                    <strong>{{ formatDate(r.fechaCheckIn) }}</strong>
+                  </div>
+                  <div class="date-arrow">→</div>
+                  <div class="date-block checkout-block">
+                    <small>Check-out</small>
+                    <strong>{{ formatDate(r.fechaCheckOut) }}</strong>
+                  </div>
+                </div>
+                <div class="booking-footer">
+                  <span [class]="'badge ' + estadoBadgeClass(r.estado)">{{ estadoLabel(r.estado) }}</span>
+                  <span class="booking-total">{{ formatPen(r.total) }} · {{ r.noches }} noches</span>
+                </div>
+              </div>
+              <div class="booking-actions">
+                @if (canCheckIn(r)) {
+                  <button class="btn btn-primary btn-sm" type="button" (click)="cambiarEstado(r.id, 'CHECK_IN')">
+                    Check-in
+                  </button>
+                }
+                @if (r.estado === 'PENDIENTE') {
+                  <button class="btn btn-outline btn-sm" type="button" (click)="cambiarEstado(r.id, 'CONFIRMADA')">
+                    Confirmar
+                  </button>
+                }
+                @if (canCheckOut(r)) {
+                  <button class="btn btn-gold btn-sm" type="button" (click)="cambiarEstado(r.id, 'CHECK_OUT')">
+                    Check-out
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+  </div>
+</section>

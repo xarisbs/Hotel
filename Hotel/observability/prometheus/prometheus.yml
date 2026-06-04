@@ -1,0 +1,57 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  - job_name: gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - gateway:7091
+
+  - job_name: auth
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - auth:8041
+
+  - job_name: cliente
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - cliente:9092
+
+  - job_name: tipo-habitacion
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - tipo-habitacion:8081
+
+  - job_name: habitacion
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - habitacion:9091
+
+  - job_name: reserva
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - reserva:9095
+
+  - job_name: facturacion
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - facturacion:6060
+
+  - job_name: reportes
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - reportes:9070

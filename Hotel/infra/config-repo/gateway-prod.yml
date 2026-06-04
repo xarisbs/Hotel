@@ -1,0 +1,87 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-route
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+
+        - id: cliente-route
+          uri: lb://cliente
+          predicates:
+            - Path=/api/v1/clientes/**
+
+        - id: cliente-swagger
+          uri: lb://cliente
+          predicates:
+            - Path=/cliente/swagger-ui/**,/cliente/v3/api-docs/**
+
+        - id: tipo-habitacion-route
+          uri: lb://tipo-habitacion
+          predicates:
+            - Path=/api/v1/tipos-habitacion/**
+
+        - id: tipo-habitacion-swagger
+          uri: lb://tipo-habitacion
+          predicates:
+            - Path=/tipo-habitacion/swagger-ui/**,/tipo-habitacion/v3/api-docs/**
+
+        - id: habitacion-route
+          uri: lb://habitacion
+          predicates:
+            - Path=/api/v1/habitaciones/**
+
+        - id: habitacion-swagger
+          uri: lb://habitacion
+          predicates:
+            - Path=/habitacion/swagger-ui/**,/habitacion/v3/api-docs/**
+
+        - id: reserva-route
+          uri: lb://reserva
+          predicates:
+            - Path=/api/v1/reservas/**
+
+        - id: reserva-swagger
+          uri: lb://reserva
+          predicates:
+            - Path=/reserva/swagger-ui/**,/reserva/v3/api-docs/**
+
+        - id: facturacion-route
+          uri: lb://facturacion
+          predicates:
+            - Path=/api/v1/facturacion/**
+
+        - id: facturacion-swagger
+          uri: lb://facturacion
+          predicates:
+            - Path=/facturacion/swagger-ui/**,/facturacion/v3/api-docs/**
+
+        - id: reportes-route
+          uri: lb://reportes
+          predicates:
+            - Path=/api/v1/reportes/**
+
+        - id: reportes-swagger
+          uri: lb://reportes
+          predicates:
+            - Path=/reportes/swagger-ui/**,/reportes/v3/api-docs/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry-server:7081/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: auth

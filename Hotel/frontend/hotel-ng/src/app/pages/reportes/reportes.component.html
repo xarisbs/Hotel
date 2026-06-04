@@ -1,0 +1,87 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Reportes e inteligencia</h1>
+    <p>Análisis ejecutivo — Hotel Inti Suites</p>
+  </header>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  @if (data(); as d) {
+    <div class="stat-grid summary-row">
+      <article class="card stat-card stat-primary card-elevated">
+        <span class="stat-label">Ocupación</span>
+        <span class="stat-value">{{ d.tasaOcupacion }}%</span>
+      </article>
+      <article class="card stat-card stat-success card-elevated">
+        <span class="stat-label">Disponibles</span>
+        <span class="stat-value">{{ d.habitacionesDisponibles }}</span>
+      </article>
+      <article class="card stat-card stat-gold card-elevated">
+        <span class="stat-label">Ocupadas</span>
+        <span class="stat-value">{{ d.habitacionesOcupadas }}</span>
+      </article>
+    </div>
+
+    <div class="grid-2 charts-grid">
+      <article class="card card-elevated chart-card">
+        <h3 class="section-title">Ingresos mensuales</h3>
+        <div class="bar-chart">
+          @for (bar of monthlyIncome(); track bar.label; let i = $index) {
+            <div class="bar-col" (mouseenter)="hoveredBar.set(i)" (mouseleave)="hoveredBar.set(null)">
+              @if (hoveredBar() === i && bar.value > 0) {
+                <span class="bar-tooltip">{{ bar.display }}</span>
+              }
+              <div class="bar-fill" [style.height.%]="barHeight(bar.value, maxIncome())" [class.highlight]="hoveredBar() === i"></div>
+              <span class="bar-label">{{ bar.label }}</span>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="card card-elevated chart-card">
+        <h3 class="section-title">Reservas por mes</h3>
+        <div class="bar-chart">
+          @for (bar of monthlyReservas(); track bar.label) {
+            <div class="bar-col">
+              <div class="bar-fill reservas" [style.height.%]="barHeight(bar.value, maxReservas())"></div>
+              <span class="bar-label">{{ bar.label }}</span>
+              <span class="bar-count">{{ bar.value }}</span>
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+
+    <div class="grid-2 charts-grid">
+      <article class="card card-elevated chart-card">
+        <h3 class="section-title">Habitaciones más reservadas</h3>
+        <ul class="rank-list">
+          @for (h of d.habitacionesMasReservadas; track h.numeroHabitacion) {
+            <li>
+              <strong>Hab. {{ h.numeroHabitacion }}</strong>
+              <span>{{ h.totalReservas }} reservas</span>
+            </li>
+          } @empty {
+            <li class="empty-text">Sin datos</li>
+          }
+        </ul>
+      </article>
+
+      <article class="card card-elevated chart-card">
+        <h3 class="section-title">Clientes frecuentes</h3>
+        <ul class="rank-list">
+          @for (c of d.clientesFrecuentes; track c.nombreHuesped) {
+            <li>
+              <strong>{{ c.nombreHuesped }}</strong>
+              <span>{{ c.totalReservas }} reservas · {{ formatPen(c.montoAcumulado) }}</span>
+            </li>
+          } @empty {
+            <li class="empty-text">Sin datos</li>
+          }
+        </ul>
+      </article>
+    </div>
+  }
+</section>

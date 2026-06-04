@@ -1,0 +1,64 @@
+.toolbar-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.payments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.payment-card {
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.comprobante {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+.amount {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: var(--primary);
+}
+
+.payment-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.badge-pagado {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.badge-pendiente {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.badge-anulado {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+small {
+  color: var(--text-light);
+  font-size: 0.75rem;
+}

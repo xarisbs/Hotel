@@ -1,0 +1,72 @@
+<div class="login-page">
+  <div class="login-visual">
+    <div class="visual-overlay"></div>
+    <div class="visual-content">
+      <div class="visual-logo">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path
+            d="M12 34V18l12-8 12 8v16M18 34v-8h12v8"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h1>Hotel Inti Suites</h1>
+      <p>Experiencia de gestión hotelera de clase mundial</p>
+      <ul class="visual-features">
+        <li>Dashboard ejecutivo en tiempo real</li>
+        <li>Control de reservas y ocupación</li>
+        <li>Gestión integral de huéspedes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="login-form-area">
+    <div class="login-card card card-elevated">
+      <header class="login-header">
+        <h2>Bienvenido</h2>
+        <p>Ingresa a tu panel de administración</p>
+      </header>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
+        <div class="form-field">
+          <label for="username">Usuario</label>
+          <input id="username" formControlName="username" autocomplete="username" placeholder="admin" />
+        </div>
+        <div class="form-field">
+          <label for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-error">{{ error() }}</div>
+        }
+
+        <button class="btn btn-gold" type="submit" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner" style="width: 18px; height: 18px; border-width: 2px"></span>
+            Ingresando…
+          } @else {
+            Acceder al panel
+          }
+        </button>
+      </form>
+
+      <footer class="login-footer">
+        <p>Cuentas de demostración</p>
+        <div class="demo-accounts">
+          <span><strong>admin</strong> — Administrador</span>
+          <span><strong>recepcion</strong> — Recepción</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>

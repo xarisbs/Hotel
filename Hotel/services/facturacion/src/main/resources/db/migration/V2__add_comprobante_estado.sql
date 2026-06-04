@@ -1,0 +1,3 @@
+ALTER TABLE pago ADD COLUMN IF NOT EXISTS numero_comprobante VARCHAR(30);
+ALTER TABLE pago ADD COLUMN IF NOT EXISTS estado VARCHAR(20) NOT NULL DEFAULT 'PAGADO';
+UPDATE pago SET numero_comprobante = CONCAT('B001-', LPAD(id, 8, '0')) WHERE numero_comprobante IS NULL;

@@ -1,0 +1,16 @@
+name: reportes-dev
+
+services:
+  mysql-reportes-dev:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_reportes
+    ports:
+      - "3395:3306"
+    volumes:
+      - mysql_hotel_reportes_dev_data:/var/lib/mysql
+
+volumes:
+  mysql_hotel_reportes_dev_data:

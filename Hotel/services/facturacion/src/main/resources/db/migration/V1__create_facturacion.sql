@@ -1,0 +1,7 @@
+CREATE TABLE pago (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    reserva_id BIGINT NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    metodo VARCHAR(20) NOT NULL,
+    fecha DATETIME
+);

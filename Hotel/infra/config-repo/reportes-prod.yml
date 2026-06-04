@@ -1,0 +1,33 @@
+server:
+  port: 9070
+
+spring:
+  datasource:
+    url: jdbc:mysql://${REPORTES_DB_HOST:mysql-reportes}:${REPORTES_DB_PORT:3306}/${REPORTES_DB_NAME:db_hotel_reportes}?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+    username: ${REPORTES_DB_USERNAME:root}
+    password: ${REPORTES_DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry-server:7081/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: auth

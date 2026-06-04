@@ -1,0 +1,130 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Habitaciones</h1>
+    <p>Inventario y estado en tiempo real — Hotel Inti Suites</p>
+  </header>
+
+  <div class="page-toolbar">
+    <div class="mini-stats">
+      <span><strong>{{ stats().total }}</strong> total</span>
+      <span class="dot disponible"></span>
+      <span>{{ stats().disponibles }} disponibles</span>
+      <span class="dot ocupada"></span>
+      <span>{{ stats().ocupadas }} ocupadas</span>
+    </div>
+    <div class="toolbar-actions">
+      <div class="filter-pills">
+        @for (e of estados; track e.value) {
+          <button
+            type="button"
+            class="pill"
+            [class.active]="filterEstado() === e.value"
+            (click)="filterEstado.set(e.value)"
+          >
+            {{ e.label }}
+          </button>
+        }
+      </div>
+      @if (isAdmin()) {
+        <button class="btn btn-primary" type="button" (click)="toggleForm()">
+          {{ showForm() ? 'Cancelar' : '+ Nueva habitación' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+
+  @if (showForm() && isAdmin()) {
+    <article class="card card-elevated form-panel create-panel">
+      <h3 class="section-title">Registrar habitación</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid form-grid-2">
+        <div class="form-field">
+          <label>Número</label>
+          <input formControlName="numero" placeholder="Ej. 301" />
+        </div>
+        <div class="form-field">
+          <label>Piso</label>
+          <input type="number" formControlName="piso" min="1" />
+        </div>
+        <div class="form-field">
+          <label>Tipo de suite</label>
+          <select formControlName="idTipoHabitacion">
+            @for (t of tipos(); track t.id) {
+              <option [value]="t.id">{{ t.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Precio por noche</label>
+          <input type="number" formControlName="precioPorNoche" step="0.01" />
+        </div>
+        <div class="form-field">
+          <label>Descripción</label>
+          <input formControlName="descripcion" placeholder="Vista al jardín, balcón…" />
+        </div>
+        <div class="form-actions" style="grid-column: 1 / -1">
+          <button class="btn btn-gold" type="submit">Guardar habitación</button>
+        </div>
+      </form>
+    </article>
+  }
+
+  @if (filtered().length === 0) {
+    <div class="empty-state card card-elevated">
+      <svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="var(--primary)" stroke-width="1.5">
+        <path d="M8 48V24l24-14 24 14v24M16 48v-12h32v12" />
+      </svg>
+      <h3>Sin habitaciones</h3>
+      <p>Registra tipos de suite y habitaciones para comenzar</p>
+    </div>
+  } @else {
+    <div class="room-grid">
+      @for (h of filtered(); track h.id) {
+        <article class="room-card card card-elevated">
+          <div
+            class="room-photo"
+            [style.background]="roomImageGradient(h.id, h.tipoHabitacion?.nombre)"
+          >
+            <div class="room-photo-overlay">
+              <span class="room-number">Piso {{ h.piso ?? 1 }} · Hab. {{ h.numero }}</span>
+              <span [class]="'badge ' + estadoBadgeClass(h.estado)">{{ estadoLabel(h.estado) }}</span>
+            </div>
+          </div>
+          <div class="room-body">
+            <div class="room-header">
+              <h3>{{ h.tipoHabitacion?.nombre ?? 'Suite' }}</h3>
+              <span class="room-price">{{ formatPen(h.precioPorNoche) }}<small>/noche</small></span>
+            </div>
+            @if (h.descripcion) {
+              <p class="room-desc">{{ h.descripcion }}</p>
+            }
+            <div class="occupancy-indicator">
+              <div class="occ-track">
+                <div
+                  class="occ-fill"
+                  [class.full]="h.estado === 'OCUPADA'"
+                  [style.width.%]="occupancyPercent(h.estado)"
+                ></div>
+              </div>
+              <span>{{ estadoLabel(h.estado) }}</span>
+            </div>
+            <div class="room-meta">
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />
+                </svg>
+                {{ h.tipoHabitacion?.capacidadMaxima ?? 2 }} huéspedes
+              </span>
+              @if (h.tipoHabitacion?.descripcion) {
+                <span>{{ h.tipoHabitacion?.descripcion }}</span>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

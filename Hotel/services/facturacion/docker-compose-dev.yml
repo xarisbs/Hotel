@@ -1,0 +1,16 @@
+name: facturacion-dev
+
+services:
+  mysql-facturacion-dev:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_facturacion
+    ports:
+      - "3394:3306" # MySQL dev pago
+    volumes:
+      - mysql_hotel_facturacion_dev_data:/var/lib/mysql
+
+volumes:
+  mysql_hotel_facturacion_dev_data:

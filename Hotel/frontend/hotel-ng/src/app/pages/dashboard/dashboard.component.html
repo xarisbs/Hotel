@@ -1,0 +1,151 @@
+<section class="page dashboard">
+  <header class="page-header">
+    <h1>Dashboard ejecutivo</h1>
+    <p>Visión general de Hotel Inti Suites — {{ today | date: 'fullDate' }}</p>
+  </header>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando indicadores…</span>
+    </div>
+  } @else if (data(); as d) {
+    <div class="stat-grid">
+      <article class="card stat-card stat-success card-elevated">
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+        </span>
+        <span class="stat-label">Disponibles</span>
+        <span class="stat-value">{{ disponibles() }}</span>
+        <span class="stat-meta">de {{ d.totalHabitaciones }} habitaciones</span>
+      </article>
+
+      <article class="card stat-card stat-primary card-elevated">
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 14v4M2 10V6a2 2 0 012-2h16a2 2 0 012 2v4M2 10h20" />
+          </svg>
+        </span>
+        <span class="stat-label">Ocupadas</span>
+        <span class="stat-value">{{ ocupadas() }}</span>
+        <span class="stat-meta">{{ d.porcentajeOcupacion }}% ocupación</span>
+      </article>
+
+      <article class="card stat-card stat-gold card-elevated">
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+        </span>
+        <span class="stat-label">Reservas activas</span>
+        <span class="stat-value">{{ d.reservasActivas }}</span>
+        <span class="stat-meta">{{ d.reservasPendientes }} pendientes</span>
+      </article>
+
+      <article class="card stat-card stat-gold card-elevated">
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
+        </span>
+        <span class="stat-label">Ingresos</span>
+        <span class="stat-value stat-value-sm">{{ formatPen(d.ingresosMes ?? d.ingresosTotales) }}</span>
+        <span class="stat-meta">Ingresos del mes</span>
+      </article>
+
+      <article class="card stat-card stat-warning card-elevated">
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="7" r="4" /><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+          </svg>
+        </span>
+        <span class="stat-label">Huéspedes</span>
+        <span class="stat-value">{{ d.totalHuespedes }}</span>
+        <span class="stat-meta">Clientes registrados</span>
+      </article>
+    </div>
+
+    <div class="grid-2 dashboard-panels">
+      <article class="card card-elevated panel">
+        <h3 class="section-title">Ocupación por estado</h3>
+        <div class="occupancy-chart">
+          @for (seg of occupancySegments(); track seg.label) {
+            <div class="occ-row">
+              <div class="occ-label">
+                <span class="occ-dot" [style.background]="seg.color"></span>
+                {{ estadoLabel(seg.label) }}
+              </div>
+              <div class="occ-bar-wrap">
+                <div
+                  class="occ-bar"
+                  [style.width.%]="(seg.value / totalEstados()) * 100"
+                  [style.background]="seg.color"
+                ></div>
+              </div>
+              <span class="occ-count">{{ seg.value }}</span>
+            </div>
+          }
+        </div>
+        <div class="occ-ring-wrap">
+          <div class="occ-ring-bg" [style.--pct]="d.porcentajeOcupacion">
+            <strong>{{ d.porcentajeOcupacion }}%</strong>
+            <span>Ocupación global</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card-elevated panel">
+        <div class="panel-head">
+          <h3 class="section-title">Reservas recientes</h3>
+          <a routerLink="/reservas" class="btn btn-ghost btn-sm">Ver todas</a>
+        </div>
+        @if (recentReservas().length === 0) {
+          <div class="empty-state compact">
+            <p>Sin reservas registradas</p>
+            <a routerLink="/reservas" class="btn btn-primary btn-sm">Nueva reserva</a>
+          </div>
+        } @else {
+          <ul class="reservation-list">
+            @for (r of recentReservas(); track r.id) {
+              <li>
+                <div class="res-info">
+                  <strong>{{ r.nombreHuesped }}</strong>
+                  <span>Hab. {{ r.numeroHabitacion }} · {{ formatDate(r.fechaCheckIn) }} → {{ formatDate(r.fechaCheckOut) }}</span>
+                </div>
+                <span [class]="'badge ' + estadoBadgeClass(r.estado)">{{ estadoLabel(r.estado) }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+    </div>
+
+    <div class="quick-actions card card-elevated">
+      <h3 class="section-title">Acciones rápidas</h3>
+      <div class="actions-row">
+        <a routerLink="/reservas" class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Nueva reserva
+        </a>
+        <a routerLink="/clientes" class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+          Registrar huésped
+        </a>
+        <a routerLink="/habitaciones" class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 14v4M2 10V6a2 2 0 012-2h16a2 2 0 012 2v4M2 10h20"/></svg>
+          Ver habitaciones
+        </a>
+        <a routerLink="/reportes" class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Reportes
+        </a>
+      </div>
+    </div>
+  }
+</section>

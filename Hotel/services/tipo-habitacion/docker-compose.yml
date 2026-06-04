@@ -1,0 +1,56 @@
+name: tipo-habitacion-prod
+
+services:
+  mysql-tipo-habitacion:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${CATALOGO_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${CATALOGO_MYSQL_DATABASE}
+    ports:
+      - "3382:3306" # Tu máquina (cliente externo) → MySQL prod
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${CATALOGO_MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - mysql_tipo-habitacion_data:/var/lib/mysql
+    networks:
+      - tipo-habitacion-int
+
+  tipo-habitacion:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql-tipo-habitacion:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      CATALOGO_DB_HOST: ${CATALOGO_DB_HOST}
+      CATALOGO_DB_PORT: ${CATALOGO_DB_PORT}
+      CATALOGO_DB_NAME: ${CATALOGO_DB_NAME}
+      CATALOGO_DB_USERNAME: ${CATALOGO_DB_USERNAME}
+      CATALOGO_DB_PASSWORD: ${CATALOGO_DB_PASSWORD}
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - tipo-habitacion-int
+      - ms-net
+
+volumes:
+  mysql_tipo-habitacion_data:
+
+#networks:
+#  tipo-habitacion-net:
+#    name: tipo-habitacion-net
+networks:
+  ms-net:
+    external: true
+    name: ms-net
+  tipo-habitacion-int:
+    name: tipo-habitacion-int

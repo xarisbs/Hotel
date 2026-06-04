@@ -1,0 +1,82 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Tipos de suite</h1>
+    <p>Configuración de categorías — solo administradores</p>
+  </header>
+
+  <div class="page-toolbar">
+    <p class="admin-note">Define las categorías antes de registrar habitaciones</p>
+    <button class="btn btn-primary" type="button" (click)="showForm.set(!showForm())">
+      {{ showForm() ? 'Cancelar' : '+ Nuevo tipo' }}
+    </button>
+  </div>
+
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+
+  @if (showForm()) {
+    <article class="card card-elevated form-panel">
+      <h3 class="section-title">Nueva categoría</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid form-grid-2">
+        <div class="form-field">
+          <label>Nombre</label>
+          <input formControlName="nombre" placeholder="Suite Deluxe" />
+        </div>
+        <div class="form-field">
+          <label>Capacidad máxima</label>
+          <input type="number" formControlName="capacidadMaxima" min="1" />
+        </div>
+        <div class="form-field">
+          <label>Precio base (S/)</label>
+          <input type="number" formControlName="precioBase" step="0.01" min="0.01" />
+        </div>
+        <div class="form-field">
+          <label>Camas</label>
+          <input type="number" formControlName="cantidadCamas" min="1" />
+        </div>
+        <div class="form-field" style="grid-column: 1 / -1">
+          <label>Descripción</label>
+          <input formControlName="descripcion" placeholder="Vista panorámica, jacuzzi…" />
+        </div>
+        <div class="form-actions" style="grid-column: 1 / -1">
+          <button class="btn btn-gold" type="submit">Guardar tipo</button>
+        </div>
+      </form>
+    </article>
+  }
+
+  <div class="tipo-grid">
+    @for (t of tipos(); track t.id) {
+      <article class="tipo-card card card-elevated">
+        <div class="tipo-visual">
+          <span class="tipo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
+              <path d="M3 21V9l9-6 9 6v12M9 21v-6h6v6" />
+            </svg>
+          </span>
+        </div>
+        <div class="tipo-body">
+          <h3>{{ t.nombre }}</h3>
+          @if (t.descripcion) {
+            <p>{{ t.descripcion }}</p>
+          }
+          <span class="tipo-cap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <circle cx="9" cy="7" r="4" /><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+            </svg>
+            {{ t.capacidadMaxima }} huéspedes · {{ t.cantidadCamas ?? 1 }} cama(s)
+          </span>
+          @if (t.precioBase) {
+            <span class="tipo-precio">Desde {{ t.precioBase | number: '1.2-2' }} S/ noche</span>
+          }
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state card card-elevated" style="grid-column: 1 / -1">
+        <h3>Sin tipos configurados</h3>
+        <p>Crea al menos un tipo antes de registrar habitaciones</p>
+      </div>
+    }
+  </div>
+</section>

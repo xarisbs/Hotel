@@ -1,0 +1,74 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Facturación</h1>
+    <p>Comprobantes, pagos y métodos — Hotel Inti Suites</p>
+  </header>
+
+  <div class="page-toolbar">
+    <p class="toolbar-note">{{ pagos().length }} comprobante(s) registrados</p>
+    <button class="btn btn-gold" type="button" (click)="showForm.set(!showForm())">
+      {{ showForm() ? 'Cerrar' : '+ Registrar pago' }}
+    </button>
+  </div>
+
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+
+  @if (showForm()) {
+    <article class="card card-elevated form-panel">
+      <h3 class="section-title">Nuevo comprobante</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid form-grid-2">
+        <div class="form-field">
+          <label>Reserva</label>
+          <select formControlName="reservaId" (change)="onReservaChange(+$any($event.target).value)">
+            @for (r of reservas(); track r.id) {
+              <option [value]="r.id">
+                #{{ r.id }} — {{ r.nombreHuesped }} · Hab. {{ r.numeroHabitacion }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Monto (S/)</label>
+          <input type="number" formControlName="monto" step="0.01" min="0.01" />
+        </div>
+        <div class="form-field">
+          <label>Método de pago</label>
+          <select formControlName="metodoPago">
+            @for (m of metodos; track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-actions" style="grid-column: 1 / -1">
+          <button class="btn btn-primary" type="submit">Emitir comprobante</button>
+        </div>
+      </form>
+    </article>
+  }
+
+  <div class="payments-grid">
+    @for (p of pagos(); track p.id) {
+      <article class="payment-card card card-elevated">
+        <header>
+          <span class="comprobante">{{ p.numeroComprobante ?? 'Sin comprobante' }}</span>
+          <span [class]="'badge badge-' + (p.estado?.toLowerCase() ?? 'pagado')">{{ p.estado ?? 'PAGADO' }}</span>
+        </header>
+        <strong class="amount">{{ formatPen(p.monto) }}</strong>
+        <div class="payment-meta">
+          <span>Reserva #{{ p.reservaId }}</span>
+          <span>{{ p.metodoPago }}</span>
+        </div>
+        @if (p.fechaPago) {
+          <small>{{ p.fechaPago.split('T')[0] }}</small>
+        }
+      </article>
+    } @empty {
+      <div class="empty-state card card-elevated" style="grid-column: 1 / -1">
+        <h3>Sin pagos registrados</h3>
+        <p>Registra el primer comprobante de una reserva</p>
+      </div>
+    }
+  </div>
+</section>

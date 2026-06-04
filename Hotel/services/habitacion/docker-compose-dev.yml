@@ -1,0 +1,16 @@
+name: habitacion-dev
+
+services:
+  mysql-habitacion-dev:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_habitaciones
+    ports:
+      - "3391:3306" # Tu máquina (cliente externo) → MySQL dev	
+    volumes:
+      - mysql_hotel_habitaciones_dev_data:/var/lib/mysql
+
+volumes:
+  mysql_hotel_habitaciones_dev_data:
